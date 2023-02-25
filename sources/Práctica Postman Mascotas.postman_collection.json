@@ -1,0 +1,167 @@
+{
+	"info": {
+		"_postman_id": "608aa57e-3d1c-4eae-b684-bce8bf79325a",
+		"name": "Práctica Postman Mascotas",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Añadir mascota",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Para tratar la respuesta, reemplazar posibles caracteres y obtener el JSON de respuesta",
+							"let responseBigIntsChangedToStrings = pm.response.text().replace(/([^\"\\w-])([-0-9.]{8,100})([^\"\\w-])/g, '$1\\\"$2\\\"$3');",
+							"let jsonResponse = [...responseBigIntsChangedToStrings.matchAll(/{.*}/g)];",
+							"let jsonData = JSON.parse(jsonResponse);",
+							"",
+							"// Guardamos variables de entorno",
+							"pm.environment.set(\"idMascotaAProbar\", jsonData.id);",
+							"pm.environment.set(\"nombreMascotaAProbar\", jsonData.name);",
+							"",
+							"// Pruebas sobre la operación de añadir mascota",
+							"pm.test(\"El código de respuesta es 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"El tiempo de respuesta es menor que 1000ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+							"});",
+							"",
+							"pm.test(\"El cuerpo de la respuesta es correcto\", function () {",
+							"    pm.expect(jsonData.name).to.eql(\"Yako\");",
+							"    pm.expect(jsonData.status).to.eql(\"disponible\");",
+							"    pm.expect(jsonData.category.name).to.eql(\"Perros\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"id\": 0,\n\"category\": {\n    \"id\": 1,\n    \"name\": \"Perros\"\n},\n\"name\": \"Yako\",\n\"photoUrls\": [\n\"https://purina.com.mx/sites/default/files/2022-12/nombres-para-perros-machos-02.png\"\n],\n\"tags\": [\n{\n  \"id\": 1,\n  \"name\": \"marrón\"\n}\n],\n\"status\": \"disponible\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{PETSTORE_API_URL}}",
+					"host": [
+						"{{PETSTORE_API_URL}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener Mascota",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let jsonData = pm.response.json();",
+							"",
+							"// Pruebas sobre la operación de obtener mascota",
+							"pm.test(\"El código de respuesta es 2000\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"El tiempo de respuesta es menor que 100ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(100);",
+							"});",
+							"",
+							"pm.test(\"El cuerpo de la respuesta es correcto\", function () {",
+							"    pm.expect(pm.response.text()).to.include(pm.variables.get(\"nombreMascotaAProbar\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{PETSTORE_API_URL}}/{{idMascotaAProbar}}",
+					"host": [
+						"{{PETSTORE_API_URL}}"
+					],
+					"path": [
+						"{{idMascotaAProbar}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Borrar Mascota",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//  Pruebas sobre la operación de borrar mascota",
+							"pm.test(\"El código de respuesta es 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"El tiempo de respuesta es menor que 1000ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{PETSTORE_API_URL}}/{{idMascotaAProbar}}",
+					"host": [
+						"{{PETSTORE_API_URL}}"
+					],
+					"path": [
+						"{{idMascotaAProbar}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "PETSTORE_API_URL",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
